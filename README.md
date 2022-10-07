@@ -17,8 +17,11 @@ stop qemu
 ctrl+a  x
 
 $ lldb
+
 $ file my-os.elf
+
 $ gdb-remote 1234
+
 $ l KMain
 
 # windows
