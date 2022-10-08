@@ -38,24 +38,24 @@ make install
 ```
 qemu build failed: syscall.c:8526: undefined reference to `stime'
 ```
-+--- a/linux-user/syscall.c
-++++ b/linux-user/syscall.c
-+@@ -7651,10 +7651,12 @@ static abi_long do_syscall1(void *cpu_en
-+ #ifdef TARGET_NR_stime /* not on alpha */
-+     case TARGET_NR_stime:
-+         {
-+-            time_t host_time;
-+-            if (get_user_sal(host_time, arg1))
-++            struct timespec ts;
-++            ts.tv_nsec = 0;
-++            if (get_user_sal(ts.tv_sec, arg1)) {
-+                 return -TARGET_EFAULT;
-+-            return get_errno(stime(&host_time));
-++            }
-++            return get_errno(clock_settime(CLOCK_REALTIME, &ts));
-+         }
-+ #endif
-+ #ifdef TARGET_NR_alarm /* not on alpha */
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7651,10 +7651,12 @@ static abi_long do_syscall1(void *cpu_en
+ #ifdef TARGET_NR_stime /* not on alpha */
+     case TARGET_NR_stime:
+         {
+-            time_t host_time;
+-            if (get_user_sal(host_time, arg1))
++            struct timespec ts;
++            ts.tv_nsec = 0;
++            if (get_user_sal(ts.tv_sec, arg1)) {
+                 return -TARGET_EFAULT;
+-            return get_errno(stime(&host_time));
++            }
++            return get_errno(clock_settime(CLOCK_REALTIME, &ts));
+         }
+ #endif
+ #ifdef TARGET_NR_alarm /* not on alpha */
 ```
 
 ### 第二种 命令行安装
